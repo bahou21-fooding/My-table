@@ -56,10 +56,90 @@ body>div:first-child{position:relative!important;top:auto!important;padding:10px
   .filter-drawer{left:auto;right:24px;bottom:24px;width:420px}
   .filter-summary{padding-left:22px}
 }
+
+/* V22.2 — visible mobile filter bar */
+.mobile-filter-bar{
+  display:none;
+}
+@media(max-width:850px){
+  .toolbar{
+    position:relative!important;
+    top:auto!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:stretch!important;
+    gap:8px!important;
+    padding:9px 12px!important;
+    overflow:visible!important;
+  }
+  .toolbar input,.toolbar select{
+    flex:0 0 auto!important;
+    width:100%!important;
+    min-width:0!important;
+  }
+  .toolbar>button[data-filter],
+  .toolbar>#addBtn,
+  .toolbar>#partnerBtn,
+  .toolbar>#managePartnersBtn,
+  .toolbar>#sourcesBtn,
+  .toolbar>.filter-trigger{
+    display:none!important;
+  }
+  .mobile-filter-bar{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    width:100%;
+  }
+  .mobile-filter-bar button{
+    flex:1;
+    border:1px solid #d8dde5;
+    background:#fff;
+    color:#111827;
+    border-radius:14px;
+    padding:11px 10px;
+    font:inherit;
+    font-weight:700;
+  }
+  .mobile-filter-bar .primary{
+    background:#111827;
+    color:#fff;
+    border-color:#111827;
+  }
+  .mobile-filter-bar .count{
+    flex:0 0 auto;
+    background:#f1f5f9;
+    font-weight:600;
+  }
+  .mobile-secondary{
+    display:flex;
+    gap:8px;
+    width:100%;
+    overflow-x:auto;
+    scrollbar-width:none;
+  }
+  .mobile-secondary::-webkit-scrollbar{display:none}
+  .mobile-secondary button{
+    flex:0 0 auto;
+    border:1px solid #d8dde5;
+    background:#fff;
+    border-radius:12px;
+    padding:8px 11px;
+    white-space:nowrap;
+    font:inherit;
+    font-size:13px;
+  }
+}
 </style></head><body>
 <div style="background:#111;color:#fff;padding:8px 12px;text-align:center;font-size:12px;position:sticky;top:0;z-index:2000">🍽️ <strong>My Table — V22.1 · Filtres</strong> · Public Safe · sources référencées + Food Partners</div>
 <header><h1>🍴 My Table</h1><p>Mes adresses + recommandations Food Partners + références vers Fooding, Gault&Millau, OAD, Michelin et 50 Best.</p></header>
 <div class="toolbar"><input id="search" placeholder="Restaurant, ville, tag…"><select id="city"><option value="">Toutes les villes</option></select><button data-filter="mine" class="active">Mes adresses</button><button data-filter="mine-guide">Mes choix + guide</button><button data-filter="overlap">2+ guides</button><button data-filter="triple">3+ guides</button><button data-filter="fooding">Fooding</button><button data-filter="gault">Gault&Millau</button><button data-filter="oad">OAD</button><button data-filter="michelin">Michelin</button><button data-filter="fifty">50 Best 2025</button><button data-filter="discovery">50 Best Discovery</button><button data-filter="history50">🏆 50 Best historique</button><button id="addBtn">➕ Ajouter</button><button id="partnerBtn">👥 Food Partners</button><button id="managePartnersBtn">⚙️ Gérer les partenaires</button><button id="sourcesBtn">ℹ️ Sources & droits</button><button data-filter="all">Tout</button></div>
+
+<div id="mobileFilterBar" class="mobile-filter-bar">
+  <button id="mobileFiltersBtn" class="primary">⚙️ Filtres</button>
+  <button id="mobileResetBtn">Réinitialiser</button>
+  <button id="mobileFilterCount" class="count">357</button>
+</div>
 <div class="stats" id="stats"></div><div id="partnerBar" style="max-width:1550px;margin:auto;padding:0 22px 10px;display:none;gap:7px;flex-wrap:wrap"></div><div class="legend"><span><i class="dot mine"></i> Toi</span><span><i class="dot food"></i> Fooding</span><span><i class="dot gault"></i> Gault&Millau</span><span><i class="dot oad"></i> OAD</span><span><i class="dot michelin"></i> Michelin</span><span><i class="dot fifty"></i> 50 Best 2025</span><span><i class="dot discovery"></i> Discovery</span></div>
 <div class="layout"><section class="list" id="list"></section><section class="map"><div id="map"></div><div class="controls"><button id="reset">↺ Recentrer</button></div><div class="detail" id="detail"></div></section></div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script><script src="data.js"></script><script>
@@ -73,7 +153,7 @@ function sourceCount(p){return ['Le Fooding','Gault&Millau','OAD','Michelin','50
 function partnersOf(p){return Array.isArray(p.recommendations)?p.recommendations:[]}
 function partnerNames(){let stored=[];try{stored=JSON.parse(localStorage.getItem('mytable_partners')||'[]').map(x=>x.name)}catch(e){}return [...new Set(stored.concat(places.flatMap(p=>partnersOf(p).map(r=>r.name)).filter(Boolean)))].sort((a,b)=>a.localeCompare(b,'fr'))}
 function hasPartner(p,name){return !name||partnersOf(p).some(r=>r.name===name)}
-function matches(p){let q=search.value.trim().toLowerCase(),c=city.value,text=(p.name+' '+p.city+' '+(p.tag||'')).toLowerCase();if(q&&!text.includes(q))return false;if(c&&p.city!==c)return false;if(partnerFilter&&!hasPartner(p,partnerFilter))return false;if(window.__myTableExternalFilter&&!window.__myTableExternalFilter(p))return false;if(mode==='all')return true;if(mode==='mine-guide')return p.mine&&sourceCount(p)>0;if(mode==='overlap')return sourceCount(p)>=2;if(mode==='triple')return sourceCount(p)>=3;if(mode==='fooding')return !!p.guides?.['Le Fooding'];if(mode==='gault')return !!p.guides?.['Gault&Millau'];if(mode==='oad')return !!p.guides?.OAD;if(mode==='michelin')return !!p.guides?.Michelin;if(mode==='fifty')return !!p.guides?.['50 Best'];if(mode==='discovery')return !!p.guides?.['50 Best Discovery'];if(mode==='history50')return !!p.guide_history?.['50 Best']?.historical;return !!p[mode]}
+function matches(p){let q=search.value.trim().toLowerCase(),c=city.value,text=(p.name+' '+p.city+' '+(p.tag||'')).toLowerCase();if(q&&!text.includes(q))return false;if(c&&p.city!==c)return false;if(partnerFilter&&!hasPartner(p,partnerFilter))return false;if(window.__myTableExternalFilter)return window.__myTableExternalFilter(p);if(mode==='all')return true;if(mode==='mine-guide')return p.mine&&sourceCount(p)>0;if(mode==='overlap')return sourceCount(p)>=2;if(mode==='triple')return sourceCount(p)>=3;if(mode==='fooding')return !!p.guides?.['Le Fooding'];if(mode==='gault')return !!p.guides?.['Gault&Millau'];if(mode==='oad')return !!p.guides?.OAD;if(mode==='michelin')return !!p.guides?.Michelin;if(mode==='fifty')return !!p.guides?.['50 Best'];if(mode==='discovery')return !!p.guides?.['50 Best Discovery'];if(mode==='history50')return !!p.guide_history?.['50 Best']?.historical;return !!p[mode]}
 function badges(p){let b='';if(p.mine)b+='<span class="badge mine">Mes adresses</span>';partnersOf(p).forEach(r=>{b+='<span class="partner-badge">'+r.name+(r.status?' · '+r.status:'')+'</span>'});if(p.guides?.['Le Fooding'])b+='<span class="badge food">Fooding</span>';if(p.guides?.['Gault&Millau'])b+='<span class="badge gault">Gault&Millau</span>';if(p.guides?.OAD)b+='<span class="badge oad">OAD</span>';if(p.guides?.Michelin)b+='<span class="badge michelin">Michelin</span>';if(p.guides?.['50 Best'])b+='<span class="badge fifty">50 Best 2025</span>';if(p.guides?.['50 Best Discovery'])b+='<span class="badge discovery">Discovery</span>';return b}
 function show(p){detail.style.display='block';let links=Object.entries(p.guides||{}).filter(([,v])=>v).map(([k])=>'<a target="_blank" rel="noopener" href="'+(p.guide_urls?.[k]||'#')+'">'+k+' ↗</a>').join('');let recs=partnersOf(p).map(r=>'<p><strong>'+r.name+' :</strong> '+(r.status||'recommandé')+(r.note?' — '+r.note:'')+'</p>').join('');let hist=p.guide_history?.['50 Best'];let dh=p.guide_history?.['50 Best Discovery'];let extra='';if(hist?.historical)extra+='<p><strong>🏆 50 Best historique :</strong> '+(hist.accolades||[]).join(' · ')+'</p>';else if(hist?.year)extra+='<p><strong>50 Best 2025 :</strong> '+(hist.rank?'n°'+hist.rank+'</p>':'confirmé</p>');extra+=p.guide_history?.['50 Best Extended']?'<p><strong>50 Best 2025 — 51-100 :</strong> n°'+p.guide_history['50 Best Extended'].rank+'</p>':'';extra+=dh?'<p><strong>Discovery :</strong> confirmé</p>':'';detail.innerHTML='<h2>'+p.name+'</h2><p>'+p.city+(p.address?' · '+p.address:'')+(p.tag?' · '+p.tag:'')+'</p><div class="badges">'+badges(p)+'</div><p><strong>Score guides :</strong> '+sourceCount(p)+'/6</p>'+extra+'<p><strong>Statut :</strong> '+(p.status||'—')+'</p>'+recs+'<div class="links"><a target="_blank" rel="noopener" href="'+p.maps_url+'">Google Maps ↗</a>'+links+'</div><p style="font-size:10px">Croisements guides vérifiés au 08/09/2026 lorsqu’un badge est affiché.</p>'}
 function markerFor(p){let ll=coords[p.city]||coords.Paris,j=jitter(p.name),n=sourceCount(p),r=6+Math.min(n,6)*1.6;let col=n>=4?'#111827':n===3?'#7c3aed':n===2?'#2563eb':p.mine?'#f97316':'#6b7280';let m=L.circleMarker([ll[0]+j[0],ll[1]+j[1]],{radius:r,weight:2,color:'#fff',fillColor:col,fillOpacity:.9});m.bindTooltip(p.name,{direction:'top'});m.on('click',()=>show(p));return m}
@@ -140,7 +220,7 @@ document.getElementById('partnerBtn').onclick=()=>{const pb=document.getElementB
     window.__myTableExternalFilter=selectedMatch;
     if(typeof window.render==="function") window.render();
     const n=placesList().filter(selectedMatch).length;
-    const s=document.getElementById("filterSummary"); if(s) s.textContent=n+" restaurants affichés";
+    const s=document.getElementById("filterSummary"); if(s) s.textContent=n+" restaurants affichés"; var m=document.getElementById("mobileFilterCount"); if(m)m.textContent=n;
   }
   function setText(btn,label,on){btn.textContent=(on?"☑ ":"☐ ")+label;btn.classList.toggle("active",on);}
   function build(){
@@ -186,6 +266,24 @@ document.getElementById('partnerBtn').onclick=()=>{const pb=document.getElementB
       stats.parentNode.insertBefore(s,stats.nextSibling);
     }
     build();
+  });
+})();
+</script>
+
+<script>
+(function(){
+  function openFilters(){
+    var d=document.getElementById("filterDrawer"),b=document.getElementById("filterBackdrop");
+    if(d)d.classList.add("open"); if(b)b.classList.add("open");
+  }
+  function resetFilters(){
+    var r=document.getElementById("filterReset"); if(r)r.click();
+  }
+  document.addEventListener("DOMContentLoaded",function(){
+    var b=document.getElementById("mobileFiltersBtn");
+    var r=document.getElementById("mobileResetBtn");
+    if(b)b.onclick=openFilters;
+    if(r)r.onclick=resetFilters;
   });
 })();
 </script>
