@@ -36,28 +36,36 @@ body>div:first-child{position:relative!important;top:auto!important;padding:10px
 .stats,.legend{display:none}
 }
 
-.filter-options{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.filter-option{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:11px;padding:10px;background:#fff;font-size:13px}.filter-option input{width:18px;height:18px}.timeout{background:#111827}.filter-summary{display:flex;gap:6px;flex-wrap:wrap;padding:0 22px 8px;max-width:1550px;margin:auto}.filter-pill{background:#111827;color:#fff;border-radius:999px;padding:5px 9px;font-size:11px}@media(max-width:600px){.filter-options{grid-template-columns:1fr}.filter-option{padding:11px}.toolbar{position:sticky;top:39px}}
-
-/* V22 — independent source filters */
-.filter-modal{padding:18px!important}
-.filter-modal h3{font-size:20px;margin:0 0 6px}
-.filter-modal .filter-sub{color:#6b7280;font-size:13px;margin:0 0 14px}
-.filter-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.filter-grid label{display:flex;align-items:center;gap:9px;padding:12px;border:1px solid #e5e7eb;border-radius:14px;background:#fff;font-size:14px}
-.filter-grid label input{width:18px;height:18px;accent-color:#111827}
-.filter-group-title{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#6b7280;margin:15px 0 7px}
-.filter-result{font-weight:700}
-@media(max-width:600px){.filter-grid{grid-template-columns:1fr}.filter-modal{max-height:82vh;overflow:auto}}
+/* V22.1 — clean filter drawer */
+.filter-trigger{display:inline-flex!important;align-items:center;gap:6px}
+.filter-backdrop{display:none}
+.filter-drawer{display:none;position:fixed;left:10px;right:10px;bottom:10px;z-index:5000;background:#fff;border-radius:22px;padding:18px;box-shadow:0 15px 50px rgba(0,0,0,.25);max-height:78vh;overflow:auto}
+.filter-drawer.open{display:block}
+.filter-backdrop.open{display:block;position:fixed;inset:0;background:rgba(0,0,0,.32);z-index:4999}
+.filter-title{font-size:20px;font-weight:800;margin-bottom:12px}
+.filter-section-title{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:#6b7280;font-weight:800;margin:14px 0 7px}
+.filter-options{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.filter-option{border:1px solid #d8dde5;background:#f8fafc;border-radius:13px;padding:11px 10px;text-align:left;font-size:14px}
+.filter-option.active{background:#111827;color:#fff;border-color:#111827}
+.filter-footer{display:flex;gap:8px;margin-top:15px}
+.filter-footer button{flex:1;padding:12px;border-radius:13px;border:1px solid #d8dde5;background:#fff}
+.filter-footer .apply{background:#111827;color:#fff;border-color:#111827}
+.filter-summary{font-size:12px;font-weight:700;padding:2px 12px 7px;color:#4b5563}
+.toolbar button[data-filter]{display:none!important}
+@media(min-width:851px){
+  .filter-drawer{left:auto;right:24px;bottom:24px;width:420px}
+  .filter-summary{padding-left:22px}
+}
 </style></head><body>
-<div style="background:#111;color:#fff;padding:8px 12px;text-align:center;font-size:12px;position:sticky;top:0;z-index:2000">🍽️ <strong>My Table — V22 · Sources indépendantes</strong> · Public Safe · sources référencées + Food Partners</div>
+<div style="background:#111;color:#fff;padding:8px 12px;text-align:center;font-size:12px;position:sticky;top:0;z-index:2000">🍽️ <strong>My Table — V22.1 · Filtres</strong> · Public Safe · sources référencées + Food Partners</div>
 <header><h1>🍴 My Table</h1><p>Mes adresses + recommandations Food Partners + références vers Fooding, Gault&Millau, OAD, Michelin et 50 Best.</p></header>
-<div class="toolbar"><input id="search" placeholder="Restaurant, ville, tag…"><select id="city"><option value="">Toutes les villes</option></select><button id="filterOpen" class="active">⚙️ Filtres</button><button data-filter="all">Tout</button><button id="addBtn">➕ Ajouter</button><button id="partnerBtn">👥 Food Partners</button><button id="managePartnersBtn">⚙️ Partenaires</button><button id="sourcesBtn">ℹ️ Sources</button></div>
-<div class="stats" id="stats"></div><div id="partnerBar" style="max-width:1550px;margin:auto;padding:0 22px 10px;display:none;gap:7px;flex-wrap:wrap"></div><div class="legend"><span><i class="dot mine"></i> Toi</span><span><i class="dot food"></i> Fooding</span><span><i class="dot gault"></i> Gault&Millau</span><span><i class="dot oad"></i> OAD</span><span><i class="dot michelin"></i> Michelin</span><span><i class="dot fifty"></i> 50 Best 2025</span><span><i class="dot discovery"></i> Discovery</span><span><i class="dot timeout"></i> Time Out Paris</span></div>
+<div class="toolbar"><input id="search" placeholder="Restaurant, ville, tag…"><select id="city"><option value="">Toutes les villes</option></select><button data-filter="mine" class="active">Mes adresses</button><button data-filter="mine-guide">Mes choix + guide</button><button data-filter="overlap">2+ guides</button><button data-filter="triple">3+ guides</button><button data-filter="fooding">Fooding</button><button data-filter="gault">Gault&Millau</button><button data-filter="oad">OAD</button><button data-filter="michelin">Michelin</button><button data-filter="fifty">50 Best 2025</button><button data-filter="discovery">50 Best Discovery</button><button data-filter="history50">🏆 50 Best historique</button><button id="addBtn">➕ Ajouter</button><button id="partnerBtn">👥 Food Partners</button><button id="managePartnersBtn">⚙️ Gérer les partenaires</button><button id="sourcesBtn">ℹ️ Sources & droits</button><button data-filter="all">Tout</button></div>
+<div class="stats" id="stats"></div><div id="partnerBar" style="max-width:1550px;margin:auto;padding:0 22px 10px;display:none;gap:7px;flex-wrap:wrap"></div><div class="legend"><span><i class="dot mine"></i> Toi</span><span><i class="dot food"></i> Fooding</span><span><i class="dot gault"></i> Gault&Millau</span><span><i class="dot oad"></i> OAD</span><span><i class="dot michelin"></i> Michelin</span><span><i class="dot fifty"></i> 50 Best 2025</span><span><i class="dot discovery"></i> Discovery</span></div>
 <div class="layout"><section class="list" id="list"></section><section class="map"><div id="map"></div><div class="controls"><button id="reset">↺ Recentrer</button></div><div class="detail" id="detail"></div></section></div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script><script src="data.js"></script><script>
 const places=[...(window.RESTAURANTS||[])],coords={Paris:[48.8566,2.3522],Nice:[43.7102,7.262],Marseille:[43.2965,5.3698],Bordeaux:[44.8378,-0.5792],Lyon:[45.764,-0.571],Londres:[51.5074,-0.1278],Milan:[45.4642,9.19],Rome:[41.9028,12.4964],Madrid:[40.4168,-3.7038],Berlin:[52.52,13.405],Marrakech:[31.6295,-7.9811],Casablanca:[33.5731,-7.5898],Reims:[49.2583,4.0317],Menton:[43.7765,7.504],Vincennes:[48.847,2.439],Guéthary:[43.422,-1.61],"Saint-Jean-de-Luz":[43.3887,-1.6627],"Ciboure / Saint-Jean-de-Luz":[43.3887,-1.6627],Ardèche:[44.7,4.5],Jura:[46.67,5.55],"Boulogne-Billancourt":[48.8397,2.2399],Vérone:[45.4384,10.9916],"Aulnay-sous-Bois":[48.938,2.495]};
 const map=L.map('map',{zoomControl:true}).setView([46.7,2.3],5.3);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap contributors'}).addTo(map);const layer=L.markerClusterGroup({showCoverageOnHover:false,maxClusterRadius:42,spiderfyOnMaxZoom:true});map.addLayer(layer);
-const search=document.getElementById('search'),city=document.getElementById('city'),list=document.getElementById('list'),detail=document.getElementById('detail'),stats=document.getElementById('stats');let mode='all', partnerFilter='', selectedFilters=[];
+const search=document.getElementById('search'),city=document.getElementById('city'),list=document.getElementById('list'),detail=document.getElementById('detail'),stats=document.getElementById('stats');let mode='mine', partnerFilter='';
 [...new Set(places.map(p=>p.city))].sort((a,b)=>a.localeCompare(b,'fr')).forEach(c=>{let o=document.createElement('option');o.value=c;o.textContent=c;city.appendChild(o)});
 function jitter(name){let h=0;for(let i=0;i<name.length;i++)h=(h*31+name.charCodeAt(i))>>>0;return [((h%1000)/1000-.5)*.045,(((h/1000)%1000)/1000-.5)*.065]}
 function guideCount(p){return Object.values(p.guides||{}).filter(Boolean).length}
@@ -65,48 +73,120 @@ function sourceCount(p){return ['Le Fooding','Gault&Millau','OAD','Michelin','50
 function partnersOf(p){return Array.isArray(p.recommendations)?p.recommendations:[]}
 function partnerNames(){let stored=[];try{stored=JSON.parse(localStorage.getItem('mytable_partners')||'[]').map(x=>x.name)}catch(e){}return [...new Set(stored.concat(places.flatMap(p=>partnersOf(p).map(r=>r.name)).filter(Boolean)))].sort((a,b)=>a.localeCompare(b,'fr'))}
 function hasPartner(p,name){return !name||partnersOf(p).some(r=>r.name===name)}
-function matches(p){
-if(partnerFilter&&!hasPartner(p,partnerFilter))return false;
-if(search.value){let q=search.value.toLowerCase();if(![p.name,p.city,p.tag].join(' ').toLowerCase().includes(q))return false}
-if(city.value&&p.city!==city.value)return false;
-if(selectedFilters.includes('mine')&&!p.mine)return false;
-let guides=selectedFilters.filter(x=>x!=='mine');
-if(guides.length&&!guides.every(k=>!!p.guides?.[k]))return false;
-if(mode==='overlap'&&sourceCount(p)<2)return false;
-if(mode==='triple'&&sourceCount(p)<3)return false;
-return true
-}
-function badges(p){let b='';if(p.mine)b+='<span class="badge mine">Mes adresses</span>';partnersOf(p).forEach(r=>{b+='<span class="partner-badge">'+r.name+(r.status?' · '+r.status:'')+'</span>'});if(p.guides?.['Le Fooding'])b+='<span class="badge food">Fooding</span>';if(p.guides?.['Gault&Millau'])b+='<span class="badge gault">Gault&Millau</span>';if(p.guides?.OAD)b+='<span class="badge oad">OAD</span>';if(p.guides?.Michelin)b+='<span class="badge michelin">Michelin</span>';if(p.guides?.['50 Best'])b+='<span class="badge fifty">50 Best 2025</span>';if(p.guides?.['50 Best Discovery'])b+='<span class="badge discovery">Discovery</span>';if(p.guides?.['Time Out Paris'])b+='<span class="badge timeout">Time Out #'+(p.timeout_rank||'')+'</span>';return b}
+function matches(p){let q=search.value.trim().toLowerCase(),c=city.value,text=(p.name+' '+p.city+' '+(p.tag||'')).toLowerCase();if(q&&!text.includes(q))return false;if(c&&p.city!==c)return false;if(partnerFilter&&!hasPartner(p,partnerFilter))return false;if(window.__myTableExternalFilter&&!window.__myTableExternalFilter(p))return false;if(mode==='all')return true;if(mode==='mine-guide')return p.mine&&sourceCount(p)>0;if(mode==='overlap')return sourceCount(p)>=2;if(mode==='triple')return sourceCount(p)>=3;if(mode==='fooding')return !!p.guides?.['Le Fooding'];if(mode==='gault')return !!p.guides?.['Gault&Millau'];if(mode==='oad')return !!p.guides?.OAD;if(mode==='michelin')return !!p.guides?.Michelin;if(mode==='fifty')return !!p.guides?.['50 Best'];if(mode==='discovery')return !!p.guides?.['50 Best Discovery'];if(mode==='history50')return !!p.guide_history?.['50 Best']?.historical;return !!p[mode]}
+function badges(p){let b='';if(p.mine)b+='<span class="badge mine">Mes adresses</span>';partnersOf(p).forEach(r=>{b+='<span class="partner-badge">'+r.name+(r.status?' · '+r.status:'')+'</span>'});if(p.guides?.['Le Fooding'])b+='<span class="badge food">Fooding</span>';if(p.guides?.['Gault&Millau'])b+='<span class="badge gault">Gault&Millau</span>';if(p.guides?.OAD)b+='<span class="badge oad">OAD</span>';if(p.guides?.Michelin)b+='<span class="badge michelin">Michelin</span>';if(p.guides?.['50 Best'])b+='<span class="badge fifty">50 Best 2025</span>';if(p.guides?.['50 Best Discovery'])b+='<span class="badge discovery">Discovery</span>';return b}
 function show(p){detail.style.display='block';let links=Object.entries(p.guides||{}).filter(([,v])=>v).map(([k])=>'<a target="_blank" rel="noopener" href="'+(p.guide_urls?.[k]||'#')+'">'+k+' ↗</a>').join('');let recs=partnersOf(p).map(r=>'<p><strong>'+r.name+' :</strong> '+(r.status||'recommandé')+(r.note?' — '+r.note:'')+'</p>').join('');let hist=p.guide_history?.['50 Best'];let dh=p.guide_history?.['50 Best Discovery'];let extra='';if(hist?.historical)extra+='<p><strong>🏆 50 Best historique :</strong> '+(hist.accolades||[]).join(' · ')+'</p>';else if(hist?.year)extra+='<p><strong>50 Best 2025 :</strong> '+(hist.rank?'n°'+hist.rank+'</p>':'confirmé</p>');extra+=p.guide_history?.['50 Best Extended']?'<p><strong>50 Best 2025 — 51-100 :</strong> n°'+p.guide_history['50 Best Extended'].rank+'</p>':'';extra+=dh?'<p><strong>Discovery :</strong> confirmé</p>':'';detail.innerHTML='<h2>'+p.name+'</h2><p>'+p.city+(p.address?' · '+p.address:'')+(p.tag?' · '+p.tag:'')+'</p><div class="badges">'+badges(p)+'</div><p><strong>Score guides :</strong> '+sourceCount(p)+'/6</p>'+extra+'<p><strong>Statut :</strong> '+(p.status||'—')+'</p>'+recs+'<div class="links"><a target="_blank" rel="noopener" href="'+p.maps_url+'">Google Maps ↗</a>'+links+'</div><p style="font-size:10px">Croisements guides vérifiés au 08/09/2026 lorsqu’un badge est affiché.</p>'}
 function markerFor(p){let ll=coords[p.city]||coords.Paris,j=jitter(p.name),n=sourceCount(p),r=6+Math.min(n,6)*1.6;let col=n>=4?'#111827':n===3?'#7c3aed':n===2?'#2563eb':p.mine?'#f97316':'#6b7280';let m=L.circleMarker([ll[0]+j[0],ll[1]+j[1]],{radius:r,weight:2,color:'#fff',fillColor:col,fillOpacity:.9});m.bindTooltip(p.name,{direction:'top'});m.on('click',()=>show(p));return m}
 function render(){layer.clearLayers();list.innerHTML='';let visible=places.filter(matches).sort((a,b)=>sourceCount(b)-sourceCount(a)||a.name.localeCompare(b.name,'fr'));stats.innerHTML='<span class="stat">'+places.length+' adresses personnelles</span><span class="stat">'+places.filter(p=>sourceCount(p)>0).length+' avec ≥1 guide</span><span class="stat">'+places.filter(p=>sourceCount(p)>=2).length+' avec ≥2</span><span class="stat">'+places.filter(p=>sourceCount(p)>=3).length+' avec ≥3</span><span class="stat">'+places.filter(p=>p.guides?.['50 Best']).length+' 50 Best 2025</span><span class="stat">'+places.filter(p=>p.guides?.['50 Best Discovery']).length+' Discovery</span><span class="stat">'+visible.length+' affichées</span>';
 const pb=document.getElementById('partnerBar');pb.innerHTML='';const allPartners=partnerNames();if(allPartners.length){pb.style.display='flex';const allBtn=document.createElement('button');allBtn.className='partner-chip'+(!partnerFilter?' active':'');allBtn.textContent='Tous les partenaires';allBtn.onclick=()=>{partnerFilter='';render()};pb.appendChild(allBtn);allPartners.forEach(n=>{const b=document.createElement('button');b.className='partner-chip'+(partnerFilter===n?' active':'');b.textContent=n;b.onclick=()=>{partnerFilter=n;render()};pb.appendChild(b)})}else pb.style.display='none';
 visible.forEach(p=>{layer.addLayer(markerFor(p));let d=document.createElement('div');d.className='item'+(sourceCount(p)>=3?' top':'');d.innerHTML='<div class="name">'+p.name+' <span class="score-pill">'+sourceCount(p)+'/6</span></div><div class="meta">'+p.city+(p.tag?' · '+p.tag:'')+'</div><div class="badges">'+badges(p)+'</div>';d.onclick=()=>{let ll=coords[p.city]||coords.Paris;map.setView(ll,12);show(p)};list.appendChild(d)});let info=document.createElement('div');info.className='small';info.textContent=visible.length+' adresse(s) affichée(s) · triées par nombre de guides';list.prepend(info)}
-document.getElementById('partnerBtn').onclick=()=>{const pb=document.getElementById('partnerBar');pb.style.display=pb.style.display==='none'?'flex':'none';render()};document.querySelectorAll('[data-filter]').forEach(b=>{b.onclick=()=>{document.querySelectorAll('[data-filter]').forEach(x=>x.classList.remove('active'));b.classList.add('active');mode=b.dataset.filter;selectedFilters=[];render()}});search.oninput=render;city.onchange=render;document.getElementById('reset').onclick=()=>map.setView([46.7,2.3],5.3);render();
-</script><script>(function(){
-const fm=document.getElementById('filterModal'),box=document.getElementById('filterOptions'),count=document.getElementById('filterCount');
-const opts=[
-['mine','Mes adresses'],
-['Le Fooding','Fooding'],
-['Gault&Millau','Gault&Millau'],
-['OAD','OAD'],
-['Michelin','Michelin'],
-['50 Best','50 Best 2025'],
-['50 Best Discovery','50 Best Discovery'],
-['Time Out Paris','Time Out Paris']
-];
-function draw(){
-box.innerHTML='<div class="filter-group-title">Mes adresses</div><div class="filter-grid">'+opts.slice(0,1).map(([v,l])=>'<label><input type="checkbox" value="'+v+'" '+(selectedFilters.includes(v)?'checked':'')+'><span>'+l+'</span></label>').join('')+
-'</div><div class="filter-group-title">Guides & sélections</div><div class="filter-grid">'+opts.slice(1).map(([v,l])=>'<label><input type="checkbox" value="'+v+'" '+(selectedFilters.includes(v)?'checked':'')+'><span>'+l+'</span></label>').join('')+
-'</div><div class="filter-group-title">Intersections</div><div class="filter-grid"><label><input type="checkbox" value="__overlap" '+(mode==='overlap'?'checked':'')+'><span>2+ guides</span></label><label><input type="checkbox" value="__triple" '+(mode==='triple'?'checked':'')+'><span>3+ guides</span></label></div>';
-}
-document.getElementById('filterOpen').onclick=()=>{draw();fm.classList.add('open')};
-document.getElementById('closeFilters').onclick=()=>fm.classList.remove('open');
-document.getElementById('clearFilters').onclick=()=>{selectedFilters=[];mode='all';draw();render()};
-document.getElementById('applyFilters').onclick=()=>{
- const vals=[...box.querySelectorAll('input:checked')].map(x=>x.value);
- mode=vals.includes('__triple')?'triple':vals.includes('__overlap')?'overlap':'all';
- selectedFilters=vals.filter(x=>!x.startsWith('__'));
- fm.classList.remove('open');render();
-};
-})();</script><script>(function(){const pm=document.getElementById('partnerModal');const input=document.getElementById('partnerNameInput');const link=document.getElementById('partnerLinkInput');const key='mytable_partners';function get(){try{return JSON.parse(localStorage.getItem(key)||'[]')}catch(e){return []}}function set(v){localStorage.setItem(key,JSON.stringify(v))}function refresh(){const box=document.getElementById('partnerManageList');box.innerHTML='';get().forEach((p,i)=>{const row=document.createElement('div');row.style='display:flex;justify-content:space-between;gap:8px;align-items:center;border-top:1px solid #eee;padding:8px 0;font-size:12px';row.innerHTML='<span><strong>'+p.name+'</strong>'+(p.link?' · <a target="_blank" rel="noopener" href="'+p.link+'">lien ↗</a>':'')+'</span><button data-i="'+i+'">Supprimer</button>';row.querySelector('button').onclick=()=>{const a=get();a.splice(i,1);set(a);refresh();render()};box.appendChild(row)})}document.getElementById('managePartnersBtn').onclick=()=>{pm.classList.add('open');refresh()};document.getElementById('closePartner').onclick=()=>pm.classList.remove('open');document.getElementById('savePartner').onclick=()=>{const name=input.value.trim();if(!name)return;const a=get();if(!a.some(x=>x.name.toLowerCase()===name.toLowerCase()))a.push({name,link:link.value.trim()});set(a);input.value='';link.value='';refresh();render()};})();</script><script>const addModal=document.getElementById('addModal');const openAdd=()=>addModal.classList.add('open');const closeAdd=()=>addModal.classList.remove('open');document.getElementById('addBtn').onclick=openAdd;document.getElementById('cancelAdd').onclick=closeAdd;function loadLocal(){try{return JSON.parse(localStorage.getItem('mytable_additions')||'[]')}catch(e){return []}}function saveLocal(){localStorage.setItem('mytable_additions',JSON.stringify(places.filter(p=>p.localAddition)));}loadLocal().forEach(p=>{p.localAddition=true;const ex=places.find(x=>x.name.toLowerCase()===p.name.toLowerCase()&&x.city.toLowerCase()===p.city.toLowerCase());if(ex){ex.recommendations=partnersOf(ex).concat(partnersOf(p).filter(r=>!partnersOf(ex).some(z=>z.name===r.name)));}else places.push(p)});render();function addRestaurant(){const name=document.getElementById('fName').value.trim(),cityName=document.getElementById('fCity').value.trim();if(!name||!cityName){alert('Il faut au minimum un nom et une ville.');return}const status=document.getElementById('fStatus').value,tag=document.getElementById('fTag').value.trim();let partner=document.getElementById('fPartner').value;if(partner==='__new__'){partner=(prompt('Nom du Food Partner / influenceur :')||'').trim();if(!partner)return}const note=document.getElementById('fPartnerNote').value.trim();const maps='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(name+' '+cityName);const existing=places.find(x=>x.name.toLowerCase()===name.toLowerCase()&&x.city.toLowerCase()===cityName.toLowerCase());if(existing){existing.mine=existing.mine||partner==='Brahim';existing.status=existing.status||status;existing.tag=existing.tag||tag;existing.recommendations=partnersOf(existing);const i=existing.recommendations.findIndex(r=>r.name===partner);const rec={name:partner,status,note};if(i>=0)existing.recommendations[i]=rec;else existing.recommendations.push(rec);existing.localAddition=true;saveLocal();closeAdd();search.value=name;render();return}const p={name,city:cityName,status,tag,mine:partner==='Brahim',localAddition:true,fooding:false,gault:false,oad:false,michelin:false,links:{maps},guides:{OAD:false,'Gault&Millau':false,'Le Fooding':false,Michelin:false,'50 Best':false,'50 Best Discovery':false},guide_urls:{OAD:'https://www.oadguides.com/lists/europe/top-new-restaurants/2026','Gault&Millau':'https://fr.gaultmillau.com/fr/search/restaurant','Le Fooding':'https://lefooding.com/recherche/restaurant/place/paris',Michelin:'https://guide.michelin.com/fr/fr/selection/france/restaurants','50 Best':'https://www.theworlds50best.com/restaurants/best-in-the-world/','50 Best Discovery':'https://www.theworlds50best.com/discovery/'},maps_url:maps,address:'',address_verified:false,verified_on:new Date().toISOString().slice(0,10),guide_count:0,source_count:0,guide_history:{},recommendations:[{name:partner,status,note}]};places.push(p);saveLocal();if(![...city.options].some(o=>o.value===cityName)){const o=document.createElement('option');o.value=cityName;o.textContent=cityName;city.appendChild(o)}closeAdd();search.value=name;render()}document.getElementById('saveAdd').onclick=addRestaurant;document.getElementById('exportAdd').onclick=()=>{const blob=new Blob([JSON.stringify(places.filter(p=>p.localAddition),null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='my-table-ajouts.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)};</script><footer style="max-width:1550px;margin:auto;padding:14px 22px;color:#6b7280;font-size:11px">My Table V21 · prototype public. Les guides et 50 Best sont cités comme sources/références ; aucun texte éditorial ni photo de leurs sites n’est reproduit ici. Les ajouts personnels via ➕ sont stockés localement sur ton appareil. Une utilisation commerciale ou une intégration de données propriétaires peut nécessiter une licence ou une autorisation du titulaire des droits.</footer><div class="modal" id="filterModal"><div class="modal-card"><h2>⚙️ Filtres</h2><p>Choisis ce que tu veux afficher. Plusieurs sources peuvent être sélectionnées ensemble.</p><div id="filterOptions" class="filter-options"></div><div class="form-actions"><button id="clearFilters">Réinitialiser</button><button id="closeFilters">Fermer</button><button id="applyFilters" class="primary">Afficher</button></div><div class="saved-note" id="filterCount"></div></div></div><div class="modal" id="addModal"><div class="modal-card"><h2>➕ Ajouter une adresse</h2><p>Ajoute un restaurant que tu as fait, ou enrichis une adresse déjà présente. Tu peux aussi l’attribuer à Gaëlle ou à un autre Food Partner / influenceur. Les ajouts sont conservés sur cet appareil. Pour l'intégrer définitivement à la version partagée, utilise ensuite l'export.</p><div class="form-grid"><label>Nom<input id="fName" placeholder="El Celler de Can Roca"></label><label>Ville<input id="fCity" placeholder="Girona"></label><label>Statut<select id="fStatus"><option>À faire</option><option>Fait</option><option>❤️ Coup de cœur</option><option>À recommander</option></select></label><label>Tag<input id="fTag" placeholder="50 Best · voyage"></label><label>Recommandé par<select id="fPartner"><option value="Brahim">Brahim (moi)</option><option value="Gaëlle">Gaëlle</option><option value="__new__">+ Ajouter un Food Partner…</option></select></label><label>Note partenaire<input id="fPartnerNote" placeholder="Son coup de cœur, commentaire…"></label></div><div class="form-actions"><button id="cancelAdd">Annuler</button><button class="primary" id="saveAdd">Ajouter à My Table</button><button id="exportAdd">Exporter mes ajouts</button></div><div class="saved-note">Les ajouts personnels sont stockés localement : tes amis ne voient pas tes ajouts privés tant que tu ne les exportes pas.</div></div></div><div class="modal" id="partnerModal"><div class="modal-card"><h2>👥 Food Partners</h2><p>Ajoute les personnes dont tu veux suivre les sélections. Elles apparaîtront ensuite comme filtres dans My Table.</p><div class="form-grid"><label>Nom du partenaire<input id="partnerNameInput" placeholder="Gaëlle, @foodieparis…"></label><label>Lien (facultatif)<input id="partnerLinkInput" placeholder="Instagram / site"></label></div><div class="form-actions"><button id="closePartner">Fermer</button><button class="primary" id="savePartner">Ajouter le partenaire</button></div><div id="partnerManageList" style="margin-top:12px"></div><div class="saved-note">Les partenaires sont enregistrés sur cet appareil. Une recommandation reste attachée à la fiche du restaurant.</div></div></div><div class="modal" id="sourcesModal"><div class="modal-card"><h2>ℹ️ Sources & droits</h2><p><strong>My Table est une sélection personnelle.</strong> Les informations provenant de guides sont utilisées comme références factuelles et renvoient vers les pages officielles des éditeurs.</p><ul style="font-size:13px;line-height:1.55"><li><strong>Michelin</strong> : les CGU réservent l’utilisation publique/commerciale et la reproduction/extraction du contenu sans accord écrit.</li><li><strong>Gault&Millau</strong> : les contenus, marques et bases sont protégés ; les CGU prévoient une utilisation privée et demandent une autorisation pour reproduction/publication.</li><li><strong>50 Best</strong> : Discovery est une sélection éditoriale de 50 Best ; My Table utilise des références courtes et des liens vers les pages officielles, sans recopier les descriptions éditoriales.</li><li><strong>Le Fooding / OAD</strong> : même principe de prudence : informations minimales, liens officiels, pas de copie de textes ou d’images.</li></ul><p style="font-size:12px;color:#6b7280">Avant toute monétisation ou import massif d’une base tierce, obtenir l’autorisation/licence appropriée. Cette page n’est pas un avis juridique.</p><div class="form-actions"><button id="closeSources" class="primary">Fermer</button></div></div></div><script>(function(){const m=document.getElementById('sourcesModal');document.getElementById('sourcesBtn').onclick=()=>m.classList.add('open');document.getElementById('closeSources').onclick=()=>m.classList.remove('open');})();</script></body></html>
+document.getElementById('partnerBtn').onclick=()=>{const pb=document.getElementById('partnerBar');pb.style.display=pb.style.display==='none'?'flex':'none';render()};document.querySelectorAll('[data-filter]').forEach(b=>{b.onclick=()=>{document.querySelectorAll('[data-filter]').forEach(x=>x.classList.remove('active'));b.classList.add('active');mode=b.dataset.filter;render()}});search.oninput=render;city.onchange=render;document.getElementById('reset').onclick=()=>map.setView([46.7,2.3],5.3);render();
+</script><script>(function(){const pm=document.getElementById('partnerModal');const input=document.getElementById('partnerNameInput');const link=document.getElementById('partnerLinkInput');const key='mytable_partners';function get(){try{return JSON.parse(localStorage.getItem(key)||'[]')}catch(e){return []}}function set(v){localStorage.setItem(key,JSON.stringify(v))}function refresh(){const box=document.getElementById('partnerManageList');box.innerHTML='';get().forEach((p,i)=>{const row=document.createElement('div');row.style='display:flex;justify-content:space-between;gap:8px;align-items:center;border-top:1px solid #eee;padding:8px 0;font-size:12px';row.innerHTML='<span><strong>'+p.name+'</strong>'+(p.link?' · <a target="_blank" rel="noopener" href="'+p.link+'">lien ↗</a>':'')+'</span><button data-i="'+i+'">Supprimer</button>';row.querySelector('button').onclick=()=>{const a=get();a.splice(i,1);set(a);refresh();render()};box.appendChild(row)})}document.getElementById('managePartnersBtn').onclick=()=>{pm.classList.add('open');refresh()};document.getElementById('closePartner').onclick=()=>pm.classList.remove('open');document.getElementById('savePartner').onclick=()=>{const name=input.value.trim();if(!name)return;const a=get();if(!a.some(x=>x.name.toLowerCase()===name.toLowerCase()))a.push({name,link:link.value.trim()});set(a);input.value='';link.value='';refresh();render()};})();</script><script>const addModal=document.getElementById('addModal');const openAdd=()=>addModal.classList.add('open');const closeAdd=()=>addModal.classList.remove('open');document.getElementById('addBtn').onclick=openAdd;document.getElementById('cancelAdd').onclick=closeAdd;function loadLocal(){try{return JSON.parse(localStorage.getItem('mytable_additions')||'[]')}catch(e){return []}}function saveLocal(){localStorage.setItem('mytable_additions',JSON.stringify(places.filter(p=>p.localAddition)));}loadLocal().forEach(p=>{p.localAddition=true;const ex=places.find(x=>x.name.toLowerCase()===p.name.toLowerCase()&&x.city.toLowerCase()===p.city.toLowerCase());if(ex){ex.recommendations=partnersOf(ex).concat(partnersOf(p).filter(r=>!partnersOf(ex).some(z=>z.name===r.name)));}else places.push(p)});render();function addRestaurant(){const name=document.getElementById('fName').value.trim(),cityName=document.getElementById('fCity').value.trim();if(!name||!cityName){alert('Il faut au minimum un nom et une ville.');return}const status=document.getElementById('fStatus').value,tag=document.getElementById('fTag').value.trim();let partner=document.getElementById('fPartner').value;if(partner==='__new__'){partner=(prompt('Nom du Food Partner / influenceur :')||'').trim();if(!partner)return}const note=document.getElementById('fPartnerNote').value.trim();const maps='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(name+' '+cityName);const existing=places.find(x=>x.name.toLowerCase()===name.toLowerCase()&&x.city.toLowerCase()===cityName.toLowerCase());if(existing){existing.mine=existing.mine||partner==='Brahim';existing.status=existing.status||status;existing.tag=existing.tag||tag;existing.recommendations=partnersOf(existing);const i=existing.recommendations.findIndex(r=>r.name===partner);const rec={name:partner,status,note};if(i>=0)existing.recommendations[i]=rec;else existing.recommendations.push(rec);existing.localAddition=true;saveLocal();closeAdd();search.value=name;render();return}const p={name,city:cityName,status,tag,mine:partner==='Brahim',localAddition:true,fooding:false,gault:false,oad:false,michelin:false,links:{maps},guides:{OAD:false,'Gault&Millau':false,'Le Fooding':false,Michelin:false,'50 Best':false,'50 Best Discovery':false},guide_urls:{OAD:'https://www.oadguides.com/lists/europe/top-new-restaurants/2026','Gault&Millau':'https://fr.gaultmillau.com/fr/search/restaurant','Le Fooding':'https://lefooding.com/recherche/restaurant/place/paris',Michelin:'https://guide.michelin.com/fr/fr/selection/france/restaurants','50 Best':'https://www.theworlds50best.com/restaurants/best-in-the-world/','50 Best Discovery':'https://www.theworlds50best.com/discovery/'},maps_url:maps,address:'',address_verified:false,verified_on:new Date().toISOString().slice(0,10),guide_count:0,source_count:0,guide_history:{},recommendations:[{name:partner,status,note}]};places.push(p);saveLocal();if(![...city.options].some(o=>o.value===cityName)){const o=document.createElement('option');o.value=cityName;o.textContent=cityName;city.appendChild(o)}closeAdd();search.value=name;render()}document.getElementById('saveAdd').onclick=addRestaurant;document.getElementById('exportAdd').onclick=()=>{const blob=new Blob([JSON.stringify(places.filter(p=>p.localAddition),null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='my-table-ajouts.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)};</script><footer style="max-width:1550px;margin:auto;padding:14px 22px;color:#6b7280;font-size:11px">My Table V18 · prototype public. Les guides et 50 Best sont cités comme sources/références ; aucun texte éditorial ni photo de leurs sites n’est reproduit ici. Les ajouts personnels via ➕ sont stockés localement sur ton appareil. Une utilisation commerciale ou une intégration de données propriétaires peut nécessiter une licence ou une autorisation du titulaire des droits.</footer><div class="modal" id="addModal"><div class="modal-card"><h2>➕ Ajouter une adresse</h2><p>Ajoute un restaurant que tu as fait, ou enrichis une adresse déjà présente. Tu peux aussi l’attribuer à Gaëlle ou à un autre Food Partner / influenceur. Les ajouts sont conservés sur cet appareil. Pour l'intégrer définitivement à la version partagée, utilise ensuite l'export.</p><div class="form-grid"><label>Nom<input id="fName" placeholder="El Celler de Can Roca"></label><label>Ville<input id="fCity" placeholder="Girona"></label><label>Statut<select id="fStatus"><option>À faire</option><option>Fait</option><option>❤️ Coup de cœur</option><option>À recommander</option></select></label><label>Tag<input id="fTag" placeholder="50 Best · voyage"></label><label>Recommandé par<select id="fPartner"><option value="Brahim">Brahim (moi)</option><option value="Gaëlle">Gaëlle</option><option value="__new__">+ Ajouter un Food Partner…</option></select></label><label>Note partenaire<input id="fPartnerNote" placeholder="Son coup de cœur, commentaire…"></label></div><div class="form-actions"><button id="cancelAdd">Annuler</button><button class="primary" id="saveAdd">Ajouter à My Table</button><button id="exportAdd">Exporter mes ajouts</button></div><div class="saved-note">Les ajouts personnels sont stockés localement : tes amis ne voient pas tes ajouts privés tant que tu ne les exportes pas.</div></div></div><div class="modal" id="partnerModal"><div class="modal-card"><h2>👥 Food Partners</h2><p>Ajoute les personnes dont tu veux suivre les sélections. Elles apparaîtront ensuite comme filtres dans My Table.</p><div class="form-grid"><label>Nom du partenaire<input id="partnerNameInput" placeholder="Gaëlle, @foodieparis…"></label><label>Lien (facultatif)<input id="partnerLinkInput" placeholder="Instagram / site"></label></div><div class="form-actions"><button id="closePartner">Fermer</button><button class="primary" id="savePartner">Ajouter le partenaire</button></div><div id="partnerManageList" style="margin-top:12px"></div><div class="saved-note">Les partenaires sont enregistrés sur cet appareil. Une recommandation reste attachée à la fiche du restaurant.</div></div></div><div class="modal" id="sourcesModal"><div class="modal-card"><h2>ℹ️ Sources & droits</h2><p><strong>My Table est une sélection personnelle.</strong> Les informations provenant de guides sont utilisées comme références factuelles et renvoient vers les pages officielles des éditeurs.</p><ul style="font-size:13px;line-height:1.55"><li><strong>Michelin</strong> : les CGU réservent l’utilisation publique/commerciale et la reproduction/extraction du contenu sans accord écrit.</li><li><strong>Gault&Millau</strong> : les contenus, marques et bases sont protégés ; les CGU prévoient une utilisation privée et demandent une autorisation pour reproduction/publication.</li><li><strong>50 Best</strong> : Discovery est une sélection éditoriale de 50 Best ; My Table utilise des références courtes et des liens vers les pages officielles, sans recopier les descriptions éditoriales.</li><li><strong>Le Fooding / OAD</strong> : même principe de prudence : informations minimales, liens officiels, pas de copie de textes ou d’images.</li></ul><p style="font-size:12px;color:#6b7280">Avant toute monétisation ou import massif d’une base tierce, obtenir l’autorisation/licence appropriée. Cette page n’est pas un avis juridique.</p><div class="form-actions"><button id="closeSources" class="primary">Fermer</button></div></div></div><script>(function(){const m=document.getElementById('sourcesModal');document.getElementById('sourcesBtn').onclick=()=>m.classList.add('open');document.getElementById('closeSources').onclick=()=>m.classList.remove('open');})();</script>
+<div id="filterBackdrop" class="filter-backdrop"></div>
+<div id="filterDrawer" class="filter-drawer" aria-label="Filtres My Table">
+  <div class="filter-title">Filtres</div>
+  <div class="filter-section-title">Mes adresses</div>
+  <div class="filter-options">
+    <button class="filter-option" data-filter-key="personal">☐ Mes adresses</button>
+  </div>
+  <div class="filter-section-title">Guides & listes</div>
+  <div id="guideOptions" class="filter-options"></div>
+  <div class="filter-section-title">Intersections</div>
+  <div class="filter-options">
+    <button class="filter-option" data-filter-key="2plus">☐ 2+ guides</button>
+    <button class="filter-option" data-filter-key="3plus">☐ 3+ guides</button>
+  </div>
+  <div class="filter-footer">
+    <button id="filterReset">Réinitialiser</button>
+    <button id="filterApply" class="apply">Afficher</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const GUIDE_KEYS=[
+    ["fooding","Le Fooding"],
+    ["gault","Gault&Millau"],
+    ["oad","OAD"],
+    ["michelin","Michelin"],
+    ["50best","50 Best 2025"],
+    ["discovery","50 Best Discovery"],
+    ["timeout","Time Out Paris"]
+  ];
+  const state={personal:false,guides:new Set(),two:false,three:false};
+
+  function placesList(){return window.RESTAURANTS||[];}
+  function isPersonal(p){return !!p.mine;}
+  function guideHas(p,k){
+    const g=p.guides||{};
+    if(k==="50best") return !!g["50 Best"];
+    if(k==="discovery") return !!g["50 Best Discovery"];
+    if(k==="fooding") return !!g["Le Fooding"];
+    if(k==="gault") return !!g["Gault&Millau"];
+    if(k==="oad") return !!g.OAD;
+    if(k==="michelin") return !!g.Michelin;
+    if(k==="timeout") return !!g["Time Out Paris"];
+    return false;
+  }
+  function guideCount(p){return GUIDE_KEYS.reduce((n,[k])=>n+(guideHas(p,k)?1:0),0);}
+  function selectedMatch(p){
+    if(state.personal&&!isPersonal(p)) return false;
+    for(const k of state.guides) if(!guideHas(p,k)) return false;
+    if(state.two&&guideCount(p)<2) return false;
+    if(state.three&&guideCount(p)<3) return false;
+    return true;
+  }
+  function update(){
+    window.__myTableExternalFilter=selectedMatch;
+    if(typeof window.render==="function") window.render();
+    const n=placesList().filter(selectedMatch).length;
+    const s=document.getElementById("filterSummary"); if(s) s.textContent=n+" restaurants affichés";
+  }
+  function setText(btn,label,on){btn.textContent=(on?"☑ ":"☐ ")+label;btn.classList.toggle("active",on);}
+  function build(){
+    const box=document.getElementById("guideOptions");
+    box.innerHTML=GUIDE_KEYS.map(([k,label])=>'<button class="filter-option" data-guide="'+k+'">☐ '+label+'</button>').join("");
+    box.querySelectorAll("[data-guide]").forEach(btn=>btn.onclick=()=>{
+      const k=btn.dataset.guide;
+      if(state.guides.has(k)) state.guides.delete(k); else state.guides.add(k);
+      setText(btn,GUIDE_KEYS.find(x=>x[0]===k)[1],state.guides.has(k));
+    });
+    const p=document.querySelector('[data-filter-key="personal"]');
+    const two=document.querySelector('[data-filter-key="2plus"]');
+    const three=document.querySelector('[data-filter-key="3plus"]');
+    p.onclick=()=>{state.personal=!state.personal;setText(p,"Mes adresses",state.personal)};
+    two.onclick=()=>{state.two=!state.two;setText(two,"2+ guides",state.two)};
+    three.onclick=()=>{state.three=!state.three;setText(three,"3+ guides",state.three)};
+    document.getElementById("filterApply").onclick=()=>{
+      update();document.getElementById("filterDrawer").classList.remove("open");document.getElementById("filterBackdrop").classList.remove("open");
+    };
+    document.getElementById("filterReset").onclick=()=>{
+      state.personal=false;state.guides.clear();state.two=false;state.three=false;
+      document.querySelectorAll(".filter-option").forEach(b=>b.classList.remove("active"));
+      setText(p,"Mes adresses",false);setText(two,"2+ guides",false);setText(three,"3+ guides",false);
+      document.querySelectorAll("[data-guide]").forEach(b=>{b.textContent="☐ "+GUIDE_KEYS.find(x=>x[0]===b.dataset.guide)[1]});
+      update();
+    };
+    document.getElementById("filterBackdrop").onclick=()=>{
+      document.getElementById("filterDrawer").classList.remove("open");document.getElementById("filterBackdrop").classList.remove("open");
+    };
+    update();
+  }
+  document.addEventListener("DOMContentLoaded",()=>{
+    const toolbar=document.querySelector(".toolbar");
+    if(toolbar){
+      const b=document.createElement("button");
+      b.className="filter-trigger";b.textContent="⚙️ Filtres";
+      b.onclick=()=>{document.getElementById("filterDrawer").classList.add("open");document.getElementById("filterBackdrop").classList.add("open");};
+      toolbar.appendChild(b);
+    }
+    const stats=document.getElementById("stats");
+    if(stats){
+      const s=document.createElement("div");s.id="filterSummary";s.className="filter-summary";s.textContent="Toutes les adresses";
+      stats.parentNode.insertBefore(s,stats.nextSibling);
+    }
+    build();
+  });
+})();
+</script>
+</body></html>
