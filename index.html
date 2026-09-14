@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#111827">
-<title>My Table — V23</title>
+<title>My Table — V24</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
@@ -69,7 +69,7 @@ footer{max-width:1550px;margin:auto;padding:12px 22px;color:var(--muted);font-si
   .layout{position:relative;display:block;height:100dvh;min-height:0}
   .map-wrap{position:absolute;inset:0;z-index:1}
   #map{height:100%;width:100%}
-  .map-tools{top:118px;left:12px}.map-tools button{padding:8px 10px;border:0;box-shadow:0 4px 18px rgba(0,0,0,.12)}
+  .map-tools{top:118px;left:12px;right:12px;overflow:auto;scrollbar-width:none}.map-tools::-webkit-scrollbar{display:none}.map-tools button{padding:8px 10px;border:0;box-shadow:0 4px 18px rgba(0,0,0,.12)}
   .list{position:absolute;left:0;right:0;bottom:0;height:31vh;max-height:62vh;min-height:108px;z-index:1300;border:0;border-radius:24px 24px 0 0;box-shadow:0 -10px 35px rgba(0,0,0,.17);overflow:auto;-webkit-overflow-scrolling:touch;transition:height .2s ease}
   .list.expanded{height:69vh}.list.collapsed{height:112px}
   .list-head{border:0;border-radius:24px 24px 0 0;padding:9px 16px 7px;cursor:grab}
@@ -87,7 +87,7 @@ footer{max-width:1550px;margin:auto;padding:12px 22px;color:var(--muted);font-si
 </style>
 </head>
 <body>
-<header><h1>My Table</h1><p>Ta carte personnelle de restaurants · V23</p></header>
+<header><h1>My Table</h1><p>Ta carte personnelle de restaurants · V24</p></header>
 
 <div class="topbar">
   <div class="search"><input id="search" placeholder="🔎  Rechercher un restaurant, une ville ou un tag"></div>
@@ -115,13 +115,13 @@ footer{max-width:1550px;margin:auto;padding:12px 22px;color:var(--muted);font-si
     <div id="map"></div>
     <div class="map-tools">
       <button id="reset">↺ Recentrer</button>
-      <button id="locateMe">◎ Ma position</button>
+      <button id="locateMe">◎ Ma position</button><button id="geocodeBatch">📍 Préciser la carte</button>
     </div>
     <div class="detail" id="detail"></div>
   </section>
 </div>
 
-<footer>My Table V23 · prototype public. Les guides et 50 Best sont cités comme sources/références ; aucun texte éditorial ni photo de leurs sites n’est reproduit ici. Les ajouts personnels via ➕ sont stockés localement sur ton appareil.</footer>
+<footer>My Table V24 · prototype public. Les guides et 50 Best sont cités comme sources/références ; aucun texte éditorial ni photo de leurs sites n’est reproduit ici. Les ajouts personnels via ➕ sont stockés localement sur ton appareil.</footer>
 
 <div class="modal" id="addModal"><div class="modal-card">
   <h2>➕ Ajouter une adresse</h2>
@@ -169,7 +169,7 @@ footer{max-width:1550px;margin:auto;padding:12px 22px;color:var(--muted);font-si
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
-<script src="data.js?v=23.0"></script>
+<script src="data.js?v=24.0"></script>
 <script>
 const places=[...(window.RESTAURANTS||[])];
 
@@ -238,13 +238,31 @@ async function geocode(p){
      const ll=[parseFloat(a[0].lat),parseFloat(a[0].lon)];
      const exact=!!p.address;
      saveCoords(p,ll,exact,'Nominatim');
-     if(selected===p) openDetail(p);
-     renderMarkers();
-     map.setView(ll,16,{animate:true});
      return true;
    }
  }catch(e){}
  return false;
+}
+function exactAddressPlaces(){return places.filter(p=>p.address && !cachedCoords(p));}
+let geocodeRunning=false;
+async function geocodeProgressively(){
+ if(geocodeRunning)return;
+ const queue=exactAddressPlaces();
+ if(!queue.length){updateGeoButton('✓ Carte déjà précisée');return;}
+ geocodeRunning=true;const btn=document.getElementById('geocodeBatch');let done=0,ok=0;
+ for(const p of queue){
+   btn.textContent='📍 '+done+'/'+queue.length;
+   if(await geocode(p))ok++;
+   done++; renderMarkers();
+   await new Promise(r=>setTimeout(r,1050));
+ }
+ geocodeRunning=false;updateGeoButton('✓ '+ok+' positions précises');render();
+}
+function updateGeoButton(text){const b=document.getElementById('geocodeBatch');if(b)b.textContent=text;}
+function geoStatus(){
+ const precise=places.filter(p=>cachedCoords(p)?.exact || (Number.isFinite(p.lat)&&Number.isFinite(p.lng))).length;
+ const withAddress=places.filter(p=>p.address).length;
+ return {precise,withAddress};
 }
 
 function markerFor(p){
@@ -292,7 +310,7 @@ function renderList(visible){
 }
 function render(){
  const visible=places.filter(matches).sort((a,b)=>sourceCount(b)-sourceCount(a)||a.name.localeCompare(b.name,'fr'));
- stats.innerHTML='<span class="stat">'+places.length+' adresses</span><span class="stat">'+places.filter(p=>p.mine).length+' personnelles</span><span class="stat">'+places.filter(p=>sourceCount(p)>0).length+' avec guide</span><span class="stat">'+places.filter(p=>sourceCount(p)>=2).length+' avec ≥2 guides</span><span class="stat">'+visible.length+' affichées</span>';
+ const gs=geoStatus();stats.innerHTML='<span class="stat">'+places.length+' adresses</span><span class="stat">'+places.filter(p=>p.mine).length+' personnelles</span><span class="stat">'+places.filter(p=>sourceCount(p)>0).length+' avec guide</span><span class="stat">'+places.filter(p=>sourceCount(p)>=2).length+' avec ≥2 guides</span><span class="stat">📍 '+gs.precise+' précises</span><span class="stat">'+visible.length+' affichées</span>';
  renderList(visible);renderMarkers();renderPartners();
  document.getElementById('mobileMine').classList.toggle('dark',window.__myTableExternalFilter===undefined);
 }
@@ -306,6 +324,7 @@ function renderPartners(){
 
 document.getElementById('reset').onclick=()=>{map.setView([46.7,2.3],5.3,{animate:true});detail.classList.remove('open')};
 document.getElementById('locateMe').onclick=()=>{if(navigator.geolocation)navigator.geolocation.getCurrentPosition(pos=>map.setView([pos.coords.latitude,pos.coords.longitude],13),()=>alert('La localisation est indisponible.'))};
+document.getElementById('geocodeBatch').onclick=geocodeProgressively;
 search.oninput=render;city.onchange=render;
 document.getElementById('partnerBtn').onclick=()=>document.getElementById('partnerModal').classList.add('open');
 document.getElementById('sourcesBtn').onclick=()=>document.getElementById('sourcesModal').classList.add('open');
